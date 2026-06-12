@@ -10,7 +10,7 @@ Claude Code writes a session log for every project you work in (`~/.claude/proje
 2. **Scans** each project in parallel with a `research-log-scanner` sub-agent to produce a status card (goal, stage, status, next actions, confidence).
 3. **Consolidates** all cards with a `dashboard-curator` sub-agent into:
    - `DASHBOARD.md` — the operational dashboard (overview table, "needs attention", groups, your own notes section that is never overwritten),
-   - `dashboard.html` — a self-contained visual view (no internet/CDN needed),
+   - `dashboard.html` — a self-contained visual view (no internet/CDN needed) with a **한/영 language toggle** for the interface labels,
    - per-project detail cards under `projects/`.
 4. Optionally produces a **weekly lab-meeting release** (`releases/lab-meeting-YYYY-MM-DD.md`) and a `WEEKLY_LOG.md` change log, computing the delta vs. the previous week.
 
@@ -118,7 +118,7 @@ MIT — see [LICENSE](LICENSE).
 ### 무엇을 하나
 - 모든 프로젝트의 세션 로그(`~/.claude/projects`)를 압축 다이제스트로 전처리합니다.
 - 각 프로젝트를 `research-log-scanner` 서브에이전트로 병렬 스캔해 상태 카드를 만듭니다.
-- `dashboard-curator` 서브에이전트가 이를 통합해 `DASHBOARD.md`, 시각화 `dashboard.html`, 프로젝트별 상세 카드를 생성합니다.
+- `dashboard-curator` 서브에이전트가 이를 통합해 `DASHBOARD.md`, 시각화 `dashboard.html`(인터페이스 라벨 **한/영 전환** 지원), 프로젝트별 상세 카드를 생성합니다.
 - 선택적으로 주간 랩미팅 릴리스(`releases/lab-meeting-YYYY-MM-DD.md`)와 변경 로그를 만듭니다.
 
 출력 기본 위치는 `~/research-dashboard`이며 `RESEARCH_DASHBOARD_DIR` 환경변수로 바꿀 수 있습니다.
