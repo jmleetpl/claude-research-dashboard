@@ -18,10 +18,30 @@ Output goes to `~/research-dashboard` by default (override with the `RESEARCH_DA
 
 ## Install
 
+Run these **two commands one at a time** inside Claude Code — enter the first, let it finish, then enter the second. Do **not** paste both lines at once (a combined line is read as a git URL and can fail with an SSH error):
+
 ```
 /plugin marketplace add jmleetpl/claude-research-dashboard
+```
+
+```
 /plugin install research-dashboard
 ```
+
+Then run `/reload-plugins` (or restart Claude Code) to activate it, and ask **"build my dashboard"** / **"대시보드 만들어줘"** to confirm it works.
+
+### Troubleshooting
+
+- **`marketplace add` fails with `Permission denied (publickey)` or another SSH error** — your machine has no GitHub SSH key. Use the explicit HTTPS URL instead:
+  ```
+  /plugin marketplace add https://github.com/jmleetpl/claude-research-dashboard
+  ```
+  (Or tell git once to use HTTPS for GitHub: `git config --global url."https://github.com/".insteadOf "git@github.com:"`.)
+- **`install` can't find the plugin** — use the fully-qualified name:
+  ```
+  /plugin install research-dashboard@research-dashboard-marketplace
+  ```
+- **The skill doesn't trigger after installing** — run `/reload-plugins`, or fully restart Claude Code.
 
 ## Usage
 
@@ -104,10 +124,26 @@ MIT — see [LICENSE](LICENSE).
 출력 기본 위치는 `~/research-dashboard`이며 `RESEARCH_DASHBOARD_DIR` 환경변수로 바꿀 수 있습니다.
 
 ### 설치
+아래 **두 명령을 한 줄씩 따로** 실행하세요. 첫 줄을 입력해 완료된 뒤 둘째 줄을 입력합니다. 두 줄을 **한 번에 붙여넣지 마세요**(합쳐진 한 줄은 git URL로 해석되어 SSH 오류가 날 수 있습니다):
+
 ```
 /plugin marketplace add jmleetpl/claude-research-dashboard
+```
+
+```
 /plugin install research-dashboard
 ```
+
+설치 후 `/reload-plugins`(또는 Claude Code 재시작)로 활성화하고, **"대시보드 만들어줘"** 로 동작을 확인하세요.
+
+#### 문제 해결
+- **`marketplace add` 실행 시 `Permission denied (publickey)` 등 SSH 오류** — 이 PC에 GitHub SSH 키가 없는 경우입니다. HTTPS 주소로 실행하세요:
+  ```
+  /plugin marketplace add https://github.com/jmleetpl/claude-research-dashboard
+  ```
+  (또는 git에 HTTPS 사용을 한 번 지정: `git config --global url."https://github.com/".insteadOf "git@github.com:"`)
+- **`install` 이 플러그인을 못 찾을 때** — 전체 이름으로 실행: `/plugin install research-dashboard@research-dashboard-marketplace`
+- **설치 후 스킬이 안 뜰 때** — `/reload-plugins` 실행 또는 Claude Code 재시작.
 
 ### 사용법
 "대시보드 만들어줘", "연구 현황 보여줘", "대시보드 갱신해줘", "다음 할 일 뭐야?", "주간 랩미팅 자료 만들어줘" 등으로 요청하면 됩니다(영어도 동일).
