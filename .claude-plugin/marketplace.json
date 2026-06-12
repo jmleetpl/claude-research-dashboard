@@ -1,11 +1,20 @@
 {
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "research-dashboard-marketplace",
-  "owner": { "name": "jmleetpl" },
+  "description": "A unified dashboard over all your local Claude Code projects.",
+  "owner": {
+    "name": "jmleetpl",
+    "url": "https://github.com/jmleetpl"
+  },
   "plugins": [
     {
       "name": "research-dashboard",
+      "description": "Scan your Claude Code session logs across all projects and build a unified research/work dashboard (Markdown + visual HTML), with optional live chat and weekly auto-refresh.",
+      "version": "0.1.0",
+      "category": "productivity",
+      "author": { "name": "jmleetpl" },
       "source": "./research-dashboard",
-      "description": "Unified dashboard over all your Claude Code projects."
+      "homepage": "https://github.com/jmleetpl/claude-research-dashboard"
     }
   ]
 }
