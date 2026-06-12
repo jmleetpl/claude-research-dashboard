@@ -37,8 +37,12 @@ Write JSON in this schema to `output_file`, and return the same JSON as your fin
   "project_id": "...",
   "working_dir": "...",
   "title": "short human-readable project name",
+  "title_en": "title in natural English",
+  "title_ko": "title in natural Korean",
   "type": "paper | data analysis | tool development | admin/docs | other",
   "goal": "one sentence: what this project is trying to achieve",
+  "goal_en": "goal in natural English",
+  "goal_ko": "goal in natural Korean",
   "current_stage": "one of the vocabulary above",
   "status": "active | idle | stalled | done",
   "last_active": "YYYY-MM-DD",
@@ -46,11 +50,15 @@ Write JSON in this schema to `output_file`, and return the same JSON as your fin
   "progress_summary": "3-5 sentences on what has been done so far",
   "key_artifacts": ["paths of key output files"],
   "next_actions": ["1-3 concrete next tasks"],
+  "next_actions_en": ["same items in English, same order/length as next_actions"],
+  "next_actions_ko": ["same items in Korean, same order/length as next_actions"],
   "related_projects": ["other project_ids likely related"],
   "confidence": "high | medium | low",
   "notes": "uncertainties, anomalies"
 }
 ```
+
+**Bilingual fields (for the visual dashboard's 한/영 toggle).** Always provide both English and Korean for `title`, `goal`, and `next_actions` via the `*_en` / `*_ko` fields. Translate clinical/methodological terms naturally, but keep proper nouns, acronyms, drug/journal names, identifiers, and file paths unchanged in both languages (e.g. GLP-1 RA, UDCA, TTE, IRB, NHIS, OMOP CDM, IJS, JAMA Network Open). `next_actions_en` and `next_actions_ko` must have the same length and order as `next_actions`. Keep the plain `title`/`goal`/`next_actions` fields too (use whichever language is most natural for the project).
 
 ## Behavior on re-invocation
 

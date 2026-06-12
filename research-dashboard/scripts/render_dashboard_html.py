@@ -70,6 +70,45 @@ def tr(value, ko_map, en_map):
     return t(v, v)         # unknown free text: same in both languages
 
 
+CONF_KO = {"high": "높음", "medium": "중간", "low": "낮음"}
+
+
+def title_bi(c):
+    """Bilingual title: prefer title_en/title_ko, else the single title/project_id."""
+    base = c.get("title") or c.get("project_id") or ""
+    en, ko = c.get("title_en"), c.get("title_ko")
+    if en or ko:
+        return t(en or base, ko or base)
+    return esc(base)
+
+
+def goal_bi(c):
+    base = c.get("goal", "")
+    en, ko = c.get("goal_en"), c.get("goal_ko")
+    if en or ko:
+        return t(en or base, ko or base)
+    return esc(base)
+
+
+def next_items_bi(c):
+    """<li> items for next actions, bilingual when next_actions_en/_ko are provided."""
+    en, ko = c.get("next_actions_en"), c.get("next_actions_ko")
+    if en and ko:
+        n = min(len(en), len(ko), 3)
+        items = [t(en[i], ko[i]) for i in range(n)]
+    else:
+        items = [esc(x) for x in (c.get("next_actions") or [])[:3]]
+    return "".join(f"<li>{it}</li>" for it in items) or "<li class='muted'>—</li>"
+
+
+def first_next_bi(c):
+    en, ko = c.get("next_actions_en"), c.get("next_actions_ko")
+    if en and ko:
+        return t(en[0], ko[0])
+    arr = c.get("next_actions") or ["—"]
+    return esc(arr[0])
+
+
 def load_cards(scans_dir):
     cards = []
     for f in sorted(glob.glob(os.path.join(scans_dir, "*.json"))):
@@ -108,10 +147,10 @@ def card_html(c):
     label_en, label_ko, fg, bg = STATUS_META[st]
     da = days_ago(c.get("last_active"))
     da_txt = f"{da}{t('d ago', '일 전')}" if da is not None else "—"
-    nexts = c.get("next_actions") or []
-    next_items = "".join(f"<li>{esc(n)}</li>" for n in nexts[:3]) or "<li class='muted'>—</li>"
+    next_items = next_items_bi(c)
     conf = c.get("confidence", "")
-    conf_badge = f"<span class='conf conf-{esc(conf)}'>{t('confidence', '신뢰도')} {esc(conf)}</span>" if conf else ""
+    conf_badge = (f"<span class='conf conf-{esc(conf)}'>{t('confidence', '신뢰도')} "
+                  f"{t(conf, CONF_KO.get(conf, conf))}</span>") if conf else ""
     rel = c.get("related_projects") or []
     rel_txt = f"<div class='rel'>🔗 {t('related', '관련')}: {esc(', '.join(rel))}</div>" if rel else ""
     return f"""<article class="card" data-status="{esc(st)}" data-type="{esc(c.get('type',''))}">
@@ -119,14 +158,14 @@ def card_html(c):
         <span class="status-badge" style="color:{fg};background:{bg}">{t(label_en, label_ko)}</span>
         <span class="type-tag">{tr(c.get('type',''), TYPE_KO, TYPE_EN)}</span>
       </div>
-      <h3>{esc(c.get('title') or c.get('project_id'))}</h3>
+      <h3>{title_bi(c)}</h3>
       <div class="meta">
         <span>📍 {tr(c.get('current_stage',''), STAGE_KO, STAGE_EN)}</span>
         <span>🕒 {da_txt} <span class="muted">({esc(c.get('last_active',''))})</span></span>
         <span>💬 {esc(c.get('n_sessions',0))} {t('sessions', '세션')}</span>
         {conf_badge}
       </div>
-      <p class="goal">{esc(c.get('goal',''))}</p>
+      <p class="goal">{goal_bi(c)}</p>
       <div class="next"><b>{t('Next actions', '다음 할 일')}</b><ul>{next_items}</ul></div>
       {rel_txt}
     </article>"""
@@ -167,9 +206,9 @@ def render(cards, generated):
 
     attention_html = "".join(
         f"<li><span class='dot dot-{esc(c.get('status'))}'></span>"
-        f"<b>{esc(c.get('title'))}</b> "
+        f"<b>{title_bi(c)}</b> "
         f"<span class='muted'>({tr(c.get('current_stage'), STAGE_KO, STAGE_EN)} · {esc(c.get('last_active'))})</span>"
-        f"<div class='att-next'>→ {esc((c.get('next_actions') or ['—'])[0])}</div></li>"
+        f"<div class='att-next'>→ {first_next_bi(c)}</div></li>"
         for c in attention[:6]
     ) or f"<li class='muted'>{t('Nothing needs attention', '주의가 필요한 항목 없음')}</li>"
 
