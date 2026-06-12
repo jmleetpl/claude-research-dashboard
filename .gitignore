@@ -1,0 +1,14 @@
+# Python
+__pycache__/
+*.pyc
+
+# User data / generated dashboard artifacts (never commit personal research data)
+_workspace/
+releases/
+cron-runs/
+*.jsonl
+DASHBOARD.md
+dashboard.html
+WEEKLY_LOG.md
+run_weekly.sh
+run_weekly.ps1

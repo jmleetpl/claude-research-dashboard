@@ -1,0 +1,11 @@
+{
+  "name": "research-dashboard-marketplace",
+  "owner": { "name": "jmleetpl" },
+  "plugins": [
+    {
+      "name": "research-dashboard",
+      "source": "./research-dashboard",
+      "description": "Unified dashboard over all your Claude Code projects."
+    }
+  ]
+}
