@@ -1,6 +1,8 @@
 {
   "name": "research-dashboard",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Scan your Claude Code session logs across all projects and build a unified research/work dashboard (Markdown + visual HTML), with optional live chat and weekly auto-refresh.",
-  "author": { "name": "jmleetpl" }
+  "author": {
+    "name": "jmleetpl"
+  }
 }

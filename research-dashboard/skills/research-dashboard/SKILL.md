@@ -1,6 +1,6 @@
 ---
 name: research-dashboard
-description: Unified orchestrator that manages all of your Claude Code research/work projects in a single dashboard. Scans session logs (~/.claude/projects) to determine per-project progress, generates and updates a Markdown dashboard plus a visual HTML view under RESEARCH_DASHBOARD_DIR (default ~/research-dashboard), and produces optional weekly release notes and change logs. Use this skill for any request about the status, organization, cross-project management, or weekly reporting of multiple research/work projects. Trigger keywords (English): "research status", "project overview", "dashboard", "show my progress", "what was I working on", "where did I leave off", "update/refresh/rescan the dashboard", "find stalled projects", "what's next", "weekly research update", "lab-meeting dashboard", "this week's new projects", "weekly release". Trigger keywords (Korean): "연구 현황", "프로젝트 정리", "대시보드", "진행상황 보여줘", "내 연구 뭐 있었지", "어디까지 했더라", "대시보드 업데이트/갱신/다시 스캔", "멈춘 연구 찾아줘", "다음 할 일", "주간 연구 업데이트", "랩미팅 대시보드/자료", "이번 주 새로 생긴 연구", "주간 릴리스". This skill is for managing projects ACROSS folders — single-paper writing/revision or single-folder cleanup belong to other skills. This skill handles cross-project consolidation only.
+description: Unified orchestrator that manages all of your Claude Code research/work projects in a single dashboard. Scans session logs (~/.claude/projects) to determine per-project progress, generates and updates a Markdown dashboard plus a consistently-styled visual HTML view (dashboard.html, rendered by a deterministic script on every run) under RESEARCH_DASHBOARD_DIR (default ~/research-dashboard), and produces optional weekly release notes and change logs. Use this skill for any request about the status, organization, cross-project management, or weekly reporting of multiple research/work projects. Trigger keywords (English): "research status", "project overview", "dashboard", "show my progress", "what was I working on", "where did I leave off", "update/refresh/rescan the dashboard", "find stalled projects", "what's next", "weekly research update", "lab-meeting dashboard", "this week's new projects", "weekly release". Trigger keywords (Korean): "연구 현황", "프로젝트 정리", "대시보드", "진행상황 보여줘", "내 연구 뭐 있었지", "어디까지 했더라", "대시보드 업데이트/갱신/다시 스캔", "멈춘 연구 찾아줘", "다음 할 일", "주간 연구 업데이트", "랩미팅 대시보드/자료", "이번 주 새로 생긴 연구", "주간 릴리스". This skill is for managing projects ACROSS folders — single-paper writing/revision or single-folder cleanup belong to other skills. This skill handles cross-project consolidation only.
 ---
 
 # Research Dashboard — Cross-Project Orchestrator
@@ -64,6 +64,16 @@ After all scanners complete, spawn one `dashboard-curator` agent (`subagent_type
 
 Report the curator's returned summary (stats + items needing attention) to the user. Keep it concise: N active, M stalled, the 2–3 most urgent actions, and the dashboard file path — do not copy the whole table.
 
+## Phase 3.5: Render the visual HTML — ALWAYS, every run
+
+`dashboard.html` is the **canonical visual view**, and it is produced by a **deterministic** script (`render_dashboard_html.py`). The same script yields the **same design on every machine and every run** — only the data differs. The Markdown `DASHBOARD.md` is written by an LLM (the curator) and naturally varies in wording/structure run to run; the HTML does not. So **always run this at the end of every build/update** (initial, incremental, and weekly alike) — this is what keeps the look consistent across computers and over time:
+
+```bash
+python "${CLAUDE_PLUGIN_ROOT}/scripts/render_dashboard_html.py" --scans "<dashboard_root>/_workspace/scans" --out "<dashboard_root>/dashboard.html" --date {today}
+```
+
+On Windows use `python`; on macOS/Linux use `python3`. Then tell the user to open `<dashboard_root>/dashboard.html`. **Never hand-write HTML or vary the design per run — the script owns the design.** If you only answered a simple query in Phase 0 (no scan), skip this step.
+
 ## Phase 4: Weekly lab-meeting release (weekly routine)
 
 On a weekly-update request ("weekly update", "lab-meeting materials", "weekly release") or a scheduled weekly run, do the following after Phases 1–3. **Always produce a release even if there are no new projects this week** — "no change" is still worth reporting at a lab meeting.
@@ -90,11 +100,7 @@ Exclude infrastructure/meta (non-research) projects from the delta, but mention 
 
 This is for the lab meeting, so keep the tone concise and presentation-oriented. Its role differs from `DASHBOARD.md` (operational detail).
 
-**Regenerate the visual HTML:** after creating the release, run the following to refresh `dashboard.html` (the visual dashboard) from the latest scan cards. This HTML is the main view the user normally looks at.
-
-```bash
-python "${CLAUDE_PLUGIN_ROOT}/scripts/render_dashboard_html.py" --scans "<dashboard_root>/_workspace/scans" --out "<dashboard_root>/dashboard.html" --date {today}
-```
+**Visual HTML:** `dashboard.html` is already regenerated by Phase 3.5 (which runs on every build). Just confirm it ran for this release; no separate render is needed.
 
 ### 4-3. Append the weekly log
 
@@ -123,7 +129,8 @@ A local-only chat server (`scripts/chat_server.py`) lets the user talk to a "lea
 
 ```
 session logs (.jsonl) ──[digest_sessions.py]──> digests/*.json
-  ──[scanner ×N parallel]──> scans/*.json ──[curator ×1]──> DASHBOARD.md + projects/*.md
+  ──[scanner ×N parallel]──> scans/*.json ──┬─[curator ×1]──────────> DASHBOARD.md + projects/*.md   (LLM, varies)
+                                            └─[render_dashboard_html.py]─> dashboard.html             (deterministic, fixed design)
 ```
 
 All handoffs are **file-based** (agreed-upon paths). Intermediate artifacts (`_workspace/`) are the baseline for incremental updates, so do not delete them.
